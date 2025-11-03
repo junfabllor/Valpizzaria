@@ -1,0 +1,825 @@
+﻿@model List<ValPizzaria.Models.Produto>
+@{
+    ViewData["Title"] = "Val Pizzaria - Sistema de Pedidos";
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Val Pizzaria - Monte seu Pedido</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --primary-hue: 0;
+            --primary: hsl(0, 84%, 60%);
+            --primary-dark: hsl(0, 84%, 45%);
+            --secondary: hsl(45, 100%, 51%);
+            --bg-light: hsl(0, 0%, 98%);
+            --border-color: hsl(0, 0%, 90%);
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-pizza: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        body {
+            background-image: url('/imagens/car.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(255, 255, 255, 0.85);
+                z-index: -1;
+            }
+
+        .header-pizza {
+            background: linear-gradient(135deg, hsl(0, 84%, 60%), hsl(0, 84%, 45%));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: var(--shadow-pizza);
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            border: none;
+            box-shadow: var(--shadow);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .tamanho-accordion {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            background: white;
+        }
+
+        .tamanho-header {
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s;
+        }
+
+            .tamanho-header:hover {
+                background: hsl(0, 0%, 97%);
+            }
+
+            .tamanho-header.active {
+                background: hsl(0, 84%, 97%);
+            }
+
+        .tamanho-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: hsl(0, 84%, 95%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .tamanho-content {
+            display: none;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background: hsl(0, 0%, 99%);
+        }
+
+            .tamanho-content.show {
+                display: block;
+            }
+
+        .sabor-item {
+            padding: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 0.5rem;
+        }
+
+            .sabor-item:hover {
+                background: hsl(0, 0%, 95%);
+            }
+
+        .categoria-title {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: opacity 0.2s;
+        }
+
+            .btn-primary-custom:hover:not(:disabled) {
+                opacity: 0.9;
+            }
+
+            .btn-primary-custom:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .btn-sabor {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .btn-sabor:hover {
+                border-color: var(--primary);
+            }
+
+            .btn-sabor.active {
+                background: var(--primary);
+                color: white;
+                border-color: var(--primary);
+            }
+
+        .cart-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, var(--secondary), hsl(45, 100%, 45%));
+            color: hsl(0, 0%, 20%);
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+            .whatsapp-btn:hover:not(:disabled) {
+                background: #1fb855;
+            }
+
+            .whatsapp-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25);
+        }
+
+        .badge-pedido {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header-pizza">
+        <div class="container text-center">
+            <div class="d-flex align-items-center justify-content-center gap-3 mb-2">
+                <i class="bi bi-pizza" style="font-size: 2.5rem;"></i>
+                <h1 class="display-4 fw-bold mb-0">Val Pizzaria</h1>
+                <i class="bi bi-pizza" style="font-size: 2.5rem;"></i>
+            </div>
+            <p class="lead mb-0">Monte seu pedido e envie direto pelo WhatsApp!</p>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row g-4 mb-4">
+            <!-- Coluna Esquerda: Dados do Cliente e Bebidas -->
+            <div class="col-lg-6">
+                <!-- Dados do Cliente -->
+                <div class="card mb-4">
+                    <div class="card-header-custom">
+                        <i class="bi bi-person-fill"></i> Dados do Cliente
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="nomeCliente" class="form-label fw-semibold">Nome do cliente</label>
+                            <input type="text" class="form-control" id="nomeCliente" placeholder="Digite o nome">
+                        </div>
+                        <div class="mb-3">
+                            <label for="observacao" class="form-label fw-semibold">Observação (ex: sem cebola)</label>
+                            <textarea class="form-control" id="observacao" rows="3" placeholder="Escreva observações..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <div>
+                                <p class="mb-1"><strong>Pedido:</strong> <span class="badge-pedido" id="pedidoNumero">#000</span></p>
+                                <small class="text-muted">Pedidos neste mês: <span id="pedidosMes">0</span></small>
+                            </div>
+                            <button class="btn btn-outline-secondary" onclick="novoPedido()">Novo Pedido</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bebidas -->
+                <div class="card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-cup-straw"></i> Bebidas
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 mb-2">
+                            <div class="col-8">
+                                <select id="bebidaSelect" class="form-select">
+                                    <option value="">-- Selecionar bebida --</option>
+                                    <option value="Coca-Cola 2L|14.00">Coca-Cola 2L — R$ 14,00</option>
+                                    <option value="Guaraná 2L|12.00">Guaraná 2L — R$ 12,00</option>
+                                    <option value="Fanta Laranja 2L|12.00">Fanta Laranja 2L — R$ 12,00</option>
+                                    <option value="Sprite 2L|12.00">Sprite 2L — R$ 12,00</option>
+                                    <option value="Suco Natural 1L|10.00">Suco Natural 1L — R$ 17,00</option>
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <button class="btn btn-primary-custom w-100" onclick="adicionarBebida()">Adicionar</button>
+                            </div>
+                        </div>
+                        <small class="text-muted">As bebidas vão para o mesmo carrinho.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Seleção de Pizzas -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-pizza"></i> Escolha sua Pizza
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Pizza Grande -->
+                        <div class="tamanho-accordion">
+                            <div class="tamanho-header" onclick="toggleTamanho('G')" id="header-G">
+                                <div class="d-flex align-items-center">
+                                    <div class="tamanho-icon">
+                                        <img src="~/imagens/pizza.jpg" alt="Pizza Grande" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                    </div>
+                                    <span class="fw-semibold fs-5">Pizza Grande</span>
+                                </div>
+                                <i class="bi bi-chevron-down" id="icon-G"></i>
+                            </div>
+                            <div class="tamanho-content" id="content-G">
+                                <!-- Escolha de quantidade de sabores -->
+                                <div class="mb-3">
+                                    <label class="fw-semibold d-block mb-2">Quantidade de sabores:</label>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn-sabor" id="sabor-unico-G" onclick="setMaxSabores('G', 1)">
+                                            Sabor Único
+                                        </button>
+                                        <button class="btn-sabor active" id="dois-sabores-G" onclick="setMaxSabores('G', 2)">
+                                            Dois Sabores
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted fw-semibold mb-3" id="texto-sabores-G">Escolha até 2 sabores</p>
+                                <div id="sabores-G"></div>
+                                <div class="border-top pt-3 mt-3">
+                                    <label class="form-label fw-semibold">Borda:</label>
+                                    <select class="form-select mb-3" id="borda-G">
+                                        <option value="Nenhuma">Sem borda</option>
+                                        <option value="Catupiry">Catupiry + R$ 4,00</option>
+                                        <option value="Cheddar">Cheddar + R$ 4,00</option>
+                                        <option value="Queijo">Queijo + R$ 7,00</option>
+                                    </select>
+                                    <button class="btn btn-primary-custom w-100" onclick="adicionarPizza('G')" id="btn-G" disabled>
+                                        Selecione os sabores para adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pizza Média -->
+                        <div class="tamanho-accordion">
+                            <div class="tamanho-header" onclick="toggleTamanho('M')" id="header-M">
+                                <div class="d-flex align-items-center">
+                                    <div class="tamanho-icon">
+                                        <img src="~/imagens/pizza.jpg" alt="Pizza Média" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                                    </div>
+                                    <span class="fw-semibold fs-5">Pizza Média</span>
+                                </div>
+                                <i class="bi bi-chevron-down" id="icon-M"></i>
+                            </div>
+                            <div class="tamanho-content" id="content-M">
+                                <!-- Escolha de quantidade de sabores -->
+                                <div class="mb-3">
+                                    <label class="fw-semibold d-block mb-2">Quantidade de sabores:</label>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn-sabor" id="sabor-unico-M" onclick="setMaxSabores('M', 1)">
+                                            Sabor Único
+                                        </button>
+                                        <button class="btn-sabor active" id="dois-sabores-M" onclick="setMaxSabores('M', 2)">
+                                            Dois Sabores
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted fw-semibold mb-3" id="texto-sabores-M">Escolha até 2 sabores</p>
+                                <div id="sabores-M"></div>
+                                <div class="border-top pt-3 mt-3">
+                                    <label class="form-label fw-semibold">Borda:</label>
+                                    <select class="form-select mb-3" id="borda-M">
+                                        <option value="Nenhuma">Sem borda</option>
+                                        <option value="Catupiry">Catupiry + R$ 4,00</option>
+                                        <option value="Cheddar">Cheddar + R$ 4,00</option>
+                                        <option value="Queijo">Queijo + R$ 7,00</option>
+                                    </select>
+                                    <button class="btn btn-primary-custom w-100" onclick="adicionarPizza('M')" id="btn-M" disabled>
+                                        Selecione os sabores para adicionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carrinho -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-cart3"></i> Seu Pedido
+                    </div>
+                    <div class="card-body">
+                        <div id="listaCarrinho"></div>
+                        <div class="total-box" id="totalBox">Total: R$ 0,00</div>
+                        <div class="d-flex gap-2 mb-3">
+                            <button class="btn btn-outline-danger flex-grow-1" onclick="limparCarrinho()">
+                                <i class="bi bi-trash"></i> Limpar Pedido
+                            </button>
+                        </div>
+                        <button class="whatsapp-btn" onclick="enviarWhatsApp()" id="btnWhatsApp" disabled>
+                            <i class="bi bi-whatsapp"></i> Enviar Pedido via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos produtos
+        const produtos = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+
+        // Estado da aplicação
+        let pedido = [];
+        let total = 0;
+        let saboresSelecionados = { G: [], M: [] };
+        let maxSabores = { G: 2, M: 2 };
+        let tamanhoAtivo = null;
+
+        // LocalStorage keys
+        const LS_MONTH_KEY = "valpizzaria_order_month";
+        const LS_COUNT_KEY = "valpizzaria_order_count";
+        const LS_PEDIDO_KEY = "valpizzaria_pedido";
+        const LS_TOTAL_KEY = "valpizzaria_total";
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarContadorMensal();
+            gerarPedidoNumero(false);
+            restaurarPedido();
+            renderizarSabores();
+            atualizarCarrinho();
+        });
+
+        // Definir quantidade máxima de sabores
+        function setMaxSabores(tamanho, max) {
+            maxSabores[tamanho] = max;
+            saboresSelecionados[tamanho] = [];
+
+            // Atualizar botões
+            document.getElementById(`sabor-unico-${tamanho}`).classList.toggle('active', max === 1);
+            document.getElementById(`dois-sabores-${tamanho}`).classList.toggle('active', max === 2);
+
+            // Atualizar texto
+            const texto = max === 1 ? 'Escolha 1 sabor' : 'Escolha até 2 sabores';
+            document.getElementById(`texto-sabores-${tamanho}`).textContent = texto;
+
+            // Limpar checkboxes
+            document.querySelectorAll(`#sabores-${tamanho} input[type="checkbox"]`).forEach(cb => cb.checked = false);
+
+            atualizarBotaoAdicionar(tamanho);
+        }
+
+        // Renderizar sabores por categoria
+        function renderizarSabores() {
+            ['G', 'M'].forEach(tamanho => {
+                const container = document.getElementById(`sabores-${tamanho}`);
+                let html = '';
+
+                ['Tradicional', 'Gourmet', 'Premium'].forEach(categoria => {
+                    const pizzasCategoria = produtos.filter(p => p.Categoria === categoria);
+                    if (pizzasCategoria.length === 0) return;
+
+                    const categoriaNome = categoria === 'Tradicional' ? 'Promocionais' :
+                                         categoria === 'Gourmet' ? 'Pop' : 'Premium';
+
+                    html += `<div class="categoria-title">Pizzas ${categoriaNome}</div>`;
+
+                    pizzasCategoria.forEach(produto => {
+                        const precoComDesconto = produto.Preco - calcularDescontoPorTamanho(produto.Preco, tamanho);
+                        html += `
+                            <div class="sabor-item" onclick="toggleSabor(${produto.Id}, '${tamanho}')">
+                                <div class="d-flex align-items-start gap-2">
+                                    <input type="checkbox" id="sabor-${tamanho}-${produto.Id}"
+                                           onchange="toggleSabor(${produto.Id}, '${tamanho}')"
+                                           style="margin-top: 0.25rem;">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">${produto.Nome}</div>
+                                        <small class="text-muted">${produto.Descricao}</small>
+                                        <div class="text-primary fw-semibold mt-1">R$ ${precoComDesconto.toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+
+                container.innerHTML = html;
+            });
+        }
+
+        // Calcular desconto por tamanho
+        function calcularDescontoPorTamanho(preco, tamanho) {
+            if (tamanho === 'M' && (preco === 40 || preco === 50 || preco === 60)) return 8;
+            return 0;
+        }
+
+        // Toggle tamanho accordion
+        function toggleTamanho(tamanho) {
+            const content = document.getElementById(`content-${tamanho}`);
+            const icon = document.getElementById(`icon-${tamanho}`);
+            const header = document.getElementById(`header-${tamanho}`);
+            const isOpen = content.classList.contains('show');
+
+            // Fechar todos
+            ['G', 'M'].forEach(t => {
+                document.getElementById(`content-${t}`).classList.remove('show');
+                document.getElementById(`icon-${t}`).classList.remove('bi-chevron-up');
+                document.getElementById(`icon-${t}`).classList.add('bi-chevron-down');
+                document.getElementById(`header-${t}`).classList.remove('active');
+            });
+
+            // Abrir o selecionado se estava fechado
+            if (!isOpen) {
+                content.classList.add('show');
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');
+                header.classList.add('active');
+                tamanhoAtivo = tamanho;
+            } else {
+                tamanhoAtivo = null;
+            }
+        }
+
+        // Toggle sabor
+        function toggleSabor(produtoId, tamanho) {
+            const checkbox = document.getElementById(`sabor-${tamanho}-${produtoId}`);
+            const index = saboresSelecionados[tamanho].indexOf(produtoId);
+
+            if (index > -1) {
+                saboresSelecionados[tamanho].splice(index, 1);
+                checkbox.checked = false;
+            } else {
+                if (saboresSelecionados[tamanho].length < maxSabores[tamanho]) {
+                    saboresSelecionados[tamanho].push(produtoId);
+                    checkbox.checked = true;
+                } else {
+                    alert(`Você pode escolher até ${maxSabores[tamanho]} sabor${maxSabores[tamanho] > 1 ? 'es' : ''}`);
+                    checkbox.checked = false;
+                    return;
+                }
+            }
+
+            atualizarBotaoAdicionar(tamanho);
+        }
+
+        // Atualizar botão adicionar
+        function atualizarBotaoAdicionar(tamanho) {
+            const btn = document.getElementById(`btn-${tamanho}`);
+            const selecionados = saboresSelecionados[tamanho];
+
+            if (selecionados.length === 0) {
+                btn.disabled = true;
+                btn.textContent = 'Selecione os sabores para adicionar';
+            } else {
+                btn.disabled = false;
+                const preco = calcularPrecoFinal(tamanho);
+                btn.textContent = `Adicionar - R$ ${preco.toFixed(2)}`;
+            }
+        }
+
+        // Calcular preço final
+        function calcularPrecoFinal(tamanho) {
+            const selecionados = saboresSelecionados[tamanho];
+            if (selecionados.length === 0) return 0;
+
+            const produtosSelecionados = produtos.filter(p => selecionados.includes(p.Id));
+            const maiorPreco = Math.max(...produtosSelecionados.map(p => p.Preco));
+            let preco = maiorPreco - calcularDescontoPorTamanho(maiorPreco, tamanho);
+
+            const borda = document.getElementById(`borda-${tamanho}`).value;
+            if (borda === 'Catupiry') preco += 4;
+            if (borda === 'Cheddar') preco += 4;
+            if (borda === 'Queijo') preco += 7;
+
+            return preco;
+        }
+
+        // Adicionar pizza ao carrinho
+        function adicionarPizza(tamanho) {
+            const selecionados = saboresSelecionados[tamanho];
+            if (selecionados.length === 0) {
+                alert('Selecione pelo menos um sabor');
+                return;
+            }
+
+            const produtosSelecionados = produtos.filter(p => selecionados.includes(p.Id));
+            const sabores = produtosSelecionados.map(p => p.Nome);
+            const descricoes = produtosSelecionados.map(p => p.Descricao);
+            const borda = document.getElementById(`borda-${tamanho}`).value;
+            const preco = calcularPrecoFinal(tamanho);
+
+            const item = {
+                tipo: 'Pizza',
+                nome: sabores.join(' / '),
+                sabores: sabores,
+                tamanho: tamanho,
+                borda: borda,
+                preco: preco,
+                descricao: descricoes.join(' | ')
+            };
+
+            pedido.push(item);
+            total += preco;
+
+            // Limpar seleção
+            saboresSelecionados[tamanho] = [];
+            document.querySelectorAll(`#sabores-${tamanho} input[type="checkbox"]`).forEach(cb => cb.checked = false);
+            document.getElementById(`borda-${tamanho}`).value = 'Nenhuma';
+            atualizarBotaoAdicionar(tamanho);
+
+            salvarPedido();
+            atualizarCarrinho();
+        }
+
+        // Adicionar bebida
+        function adicionarBebida() {
+            const select = document.getElementById('bebidaSelect');
+            if (!select.value) {
+                alert('Selecione uma bebida');
+                return;
+            }
+
+            const [nome, precoStr] = select.value.split('|');
+            const preco = parseFloat(precoStr);
+
+            pedido.push({ tipo: 'Bebida', nome: nome, preco: preco });
+            total += preco;
+
+            select.value = '';
+            salvarPedido();
+            atualizarCarrinho();
+        }
+
+        // Remover item do carrinho
+        function removerItem(index) {
+            total -= pedido[index].preco;
+            pedido.splice(index, 1);
+            salvarPedido();
+            atualizarCarrinho();
+        }
+
+        // Limpar carrinho
+        function limparCarrinho() {
+            if (pedido.length === 0) return;
+            if (confirm('Deseja limpar todo o pedido?')) {
+                pedido = [];
+                total = 0;
+                salvarPedido();
+                atualizarCarrinho();
+            }
+        }
+
+        // Atualizar visualização do carrinho
+        function atualizarCarrinho() {
+            const container = document.getElementById('listaCarrinho');
+            const totalBox = document.getElementById('totalBox');
+            const btnWhatsApp = document.getElementById('btnWhatsApp');
+
+            if (pedido.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center py-3">Nenhum item no carrinho</p>';
+                btnWhatsApp.disabled = true;
+            } else {
+                let html = '';
+                pedido.forEach((item, index) => {
+                    html += `
+                        <div class="cart-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">${item.nome}${item.tamanho ? ` (${item.tamanho})` : ''}</div>
+                                    ${item.borda ? `<small class="text-muted">Borda: ${item.borda}</small><br>` : ''}
+                                    ${item.descricao ? `<small class="text-muted">${item.descricao}</small>` : ''}
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-primary">R$ ${item.preco.toFixed(2)}</div>
+                                    <button class="btn btn-sm btn-outline-danger mt-2" onclick="removerItem(${index})">
+                                        <i class="bi bi-trash"></i> Remover
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                btnWhatsApp.disabled = false;
+            }
+
+            totalBox.textContent = `Total: R$ ${total.toFixed(2)}`;
+        }
+
+        // Salvar pedido no localStorage
+        function salvarPedido() {
+            localStorage.setItem(LS_PEDIDO_KEY, JSON.stringify(pedido));
+            localStorage.setItem(LS_TOTAL_KEY, total.toFixed(2));
+        }
+
+        // Restaurar pedido do localStorage
+        function restaurarPedido() {
+            const p = localStorage.getItem(LS_PEDIDO_KEY);
+            const t = localStorage.getItem(LS_TOTAL_KEY);
+
+            if (p) {
+                try {
+                    pedido = JSON.parse(p) || [];
+                } catch (e) {
+                    pedido = [];
+                }
+            }
+
+            if (t) {
+                total = parseFloat(t) || 0;
+            }
+        }
+
+        // Inicializar contador mensal
+        function inicializarContadorMensal() {
+            const today = new Date();
+            const monthKey = `${today.getFullYear()}-${today.getMonth() + 1}`;
+            const storedMonth = localStorage.getItem(LS_MONTH_KEY);
+
+            if (storedMonth !== monthKey) {
+                localStorage.setItem(LS_MONTH_KEY, monthKey);
+                localStorage.setItem(LS_COUNT_KEY, "0");
+            }
+
+            const count = parseInt(localStorage.getItem(LS_COUNT_KEY) || "0");
+            document.getElementById('pedidosMes').textContent = count;
+        }
+
+        // Gerar número do pedido
+        function gerarPedidoNumero(incrementar) {
+            const today = new Date();
+            const monthKey = `${today.getFullYear()}-${today.getMonth() + 1}`;
+
+            let storedMonth = localStorage.getItem(LS_MONTH_KEY);
+            if (storedMonth !== monthKey) {
+                localStorage.setItem(LS_MONTH_KEY, monthKey);
+                localStorage.setItem(LS_COUNT_KEY, "0");
+            }
+
+            let count = parseInt(localStorage.getItem(LS_COUNT_KEY) || "0");
+            if (incrementar) {
+                count += 1;
+                localStorage.setItem(LS_COUNT_KEY, String(count));
+                document.getElementById('pedidosMes').textContent = count;
+            }
+
+            const displayNum = String(count === 0 ? count + 1 : count).padStart(3, '0');
+            document.getElementById('pedidoNumero').textContent = `#${displayNum}`;
+        }
+
+        // Novo pedido
+        function novoPedido() {
+            gerarPedidoNumero(true);
+        }
+
+        // Enviar via WhatsApp
+        function enviarWhatsApp() {
+            if (pedido.length === 0) {
+                alert('Adicione itens antes de enviar o pedido.');
+                return;
+            }
+
+            const nomeCliente = document.getElementById('nomeCliente').value.trim() || 'Não informado';
+            const observacao = document.getElementById('observacao').value.trim() || '-';
+
+            if (!document.getElementById('nomeCliente').value.trim()) {
+                if (!confirm('Nome do cliente está vazio. Deseja continuar?')) {
+                    return;
+                }
+            }
+
+            gerarPedidoNumero(true);
+
+            const linhasItens = pedido.map(p => {
+                if (p.tipo === 'Pizza') {
+                    return `- ${p.nome} (${p.tamanho}) - Borda: ${p.borda} - R$ ${p.preco.toFixed(2)}`;
+                } else {
+                    return `- ${p.nome} - R$ ${p.preco.toFixed(2)}`;
+                }
+            }).join('\n');
+
+            const pedidoNum = document.getElementById('pedidoNumero').textContent;
+            const pedidosMes = document.getElementById('pedidosMes').textContent;
+
+            let texto = `🍕 *Pedido ${pedidoNum}* 🍕\n\n`;
+            texto += `👤 Cliente: ${nomeCliente}\n`;
+            texto += `📦 Itens:\n${linhasItens}\n\n`;
+            texto += `📝 Observação: ${observacao}\n`;
+            texto += `💰 Total: R$ ${total.toFixed(2)}\n\n`;
+            texto += `📅 Pedidos neste mês: ${pedidosMes}`;
+
+            const numero = "5563992244305";
+            const url = `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+
+            // Perguntar se deseja limpar carrinho após envio
+            setTimeout(() => {
+                if (confirm('Pedido enviado! Deseja limpar o carrinho?')) {
+                    pedido = [];
+                    total = 0;
+                    document.getElementById('nomeCliente').value = '';
+                    document.getElementById('observacao').value = '';
+                    salvarPedido();
+                    atualizarCarrinho();
+                }
+            }, 500);
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
