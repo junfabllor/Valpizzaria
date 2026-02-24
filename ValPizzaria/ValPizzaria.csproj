@@ -18,4 +18,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="https://openapi.vercel.sh/vercel.json" /></VisualStudio></ProjectExtensions>
+
 </Project>
